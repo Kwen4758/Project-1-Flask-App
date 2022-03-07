@@ -1,0 +1,12 @@
+body {
+  padding-top: 60px;
+  background-color: black;
+  color: white;
+}
+
+.main-pic {
+  width: 40vw;
+  border-radius: 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}

@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <div class="text-center">
+    <h1>Actors</h1>
+  </div>
+  <ul id="actorsList"></ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+  actorsPageHandler();
+</script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <div class="text-center">
+    <h1>{{title}}</h1>
+  </div>
+  <ul id="movieInfo"></ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script type="text/javascript">
+  moviePageHandler("{{title}}");
+</script>
+{% endblock %}
