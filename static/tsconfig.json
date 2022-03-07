@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+      "downlevelIteration": true,
+      "noImplicitAny": true,
+      "module": "commonjs",
+      "target": "ES5",
+      "pretty": true,
+  }
+}
