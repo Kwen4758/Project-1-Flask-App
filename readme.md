@@ -11,8 +11,11 @@ tsc -w
 Run the following commands from the root folder to start the app: 
 
 ```
-python3 -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 export FLASK_APP=run
 export FLASK_ENV=development
-python3 -m flask run
+python -m flask run
 ```
+(on Windows use `set` instead of `export`)
+
+You must have the 2 terminals open and running. One runs the app and the other compiles your Typescript. 
