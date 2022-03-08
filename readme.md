@@ -14,5 +14,5 @@ Run the following commands from the root folder to start the app:
 python3 -m pip install -r requirements.txt
 export FLASK_APP=run
 export FLASK_ENV=development
-flask run
+python3 -m flask run
 ```
