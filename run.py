@@ -29,3 +29,5 @@ def movies():
 @app.route("/movie/<title>")
 def movie(title):
     return render_template('movie.html', title=title, movies='true')
+
+
