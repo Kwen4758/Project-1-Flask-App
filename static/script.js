@@ -58,12 +58,12 @@ var homePageHandler = function () {
     getDataThen(function (movies) {
         var genres = getMovieGenres(movies);
         var actors = getUniqueActors(movies);
-        $displayArea.append("<li>Number of Actors: ".concat(actors.length, "</li>"));
-        $displayArea.append("<li>Number of Movies: ".concat(movies.length, "</li>"));
+        $displayArea.append("<li>Number of Actors: <span style=\"color: red\">".concat(actors.length, "</span> </li>"));
+        $displayArea.append("<li>Number of Movies: <span style=\"color: red\"> ".concat(movies.length, "</span></li>"));
         $displayArea.append("<li>Number of Movies in Each Genre:</li>");
         Object.entries(genres).forEach(function (_a) {
             var _b = __read(_a, 2), genre = _b[0], count = _b[1];
-            $displayArea.append("<li>Number of ".concat(genre, " Movies: ").concat(count, "</li>"));
+            $displayArea.append("<li>Number of ".concat(genre, " Movies: <span style=\"color: red\">").concat(count, "</span> </li>"));
         });
     });
 };
@@ -81,7 +81,7 @@ var moviesPageHandler = function () {
     getDataThen(function (movies) {
         var movieTitles = movies.map(function (movie) { return movie.title; }).sort();
         movieTitles.forEach(function (title) {
-            $displayArea.append("<li><a href=\"".concat(window.location.origin, "/movie/").concat(title, "\">").concat(title, "</a></li>"));
+            $displayArea.append("<li><a href=\"".concat(window.location.origin, "/movie/").concat(title, "\"><em>").concat(title, "</em></a></li>"));
         });
     });
 };

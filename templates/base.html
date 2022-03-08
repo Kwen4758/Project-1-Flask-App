@@ -4,6 +4,10 @@
 {% block head %}
 {{super()}}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Alegreya Sans SC' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Antonio' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Big Shoulders Text' rel='stylesheet'>
+
 {% endblock %}
 
 {% block styles %}
@@ -29,16 +33,16 @@
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="{{ url_for('index') }}">
-        <span>
+        <span style="font-family: Big Shoulders Text">
           Movies Database
         </span>
       </a>
     </div>
     <div id="navbar" class="collapse navbar-collapse">
       <ul class="nav navbar-nav">
-        <li {% if index %} class="active" {% endif %}><a href="{{ url_for('index') }}">Home</a></li>
-        <li {% if actors %} class="active" {% endif %}><a href="{{ url_for('actors') }}">Actors</a></li>
-        <li {% if movies %} class="active" {% endif %}><a href="{{ url_for('movies') }}">Movies</a></li>
+        <li {% if index %} class="active" {% endif %}><a href="{{ url_for('index') }}" style="font-family: Big Shoulders Text">Home</a></li>
+        <li {% if actors %} class="active" {% endif %}><a href="{{ url_for('actors') }}"style="font-family: Big Shoulders Text">Actors</a></li>
+        <li {% if movies %} class="active" {% endif %}><a href="{{ url_for('movies') }}"style="font-family: Big Shoulders Text">Movies</a></li>
       </ul>
     </div>
   </div>
