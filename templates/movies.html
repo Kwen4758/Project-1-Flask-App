@@ -1,9 +1,51 @@
 {% extends "base.html" %} {% block content %}
 <div class="container">
   <div class="text-center">
-    <h1 style="font-family: Antonio">Movies</h1>
+    <h1>Movies</h1>
+    <select id="sortInput" class="sort-select"> 
+      <option value="title_d" label="Sort by Title A-Z">
+      <option value="title_a" label="Sort by Title Z-A">
+      <option value="year_d" label="Sort by Year 1990-2018">
+      <option value="year_a" label="Sort by Year 2018-1990">
+    </select>
+    <button class="search-button" id="searchButton">Perform Search</button>
   </div>
-  <ul class="moviesList" id="moviesList"></ul>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 25%">
+          Title
+          <br>
+          <input type="search" placeholder="Title" id="titleInput" class="search-input"/>
+        </th>
+        <th scope="col" style="width: 15%">
+          Year
+          <br>
+          <input type="number" min="1900" max="2018" step="1" value="1900" id="yearMinInput" class="search-input" onchange="(validity.valid)||(value='1900');"/>
+          -
+          <input type="number" min="1900" max="2018" step="1" value="2018" id="yearMaxInput" class="search-input" onchange="(validity.valid)||(value='2018');"/>
+        </th>
+        <th scope="col" style="width: 45%">
+          Cast
+          <br>
+          <input type="search" placeholder="Actor" id="castInput" class="search-input"/>
+        </th>
+        <th scope="col" style="width: 15%">
+          Genres
+          <br>
+          <input type="search" placeholder="Genre" id="genreInput" class="search-input"/>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="moviesTableBody">
+      <tr>
+        <td>Loading...</td>
+        <td>Loading...</td>
+        <td>Loading...</td>
+        <td>Loading...</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 {% endblock %}
 

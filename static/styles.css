@@ -2,10 +2,6 @@ body {
   padding-top: 60px;
   background-color: black;
   color: white;
-  background-image: url("moviebackground.jpg");
-  background-size: cover;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
 }
 
 .main-pic {
@@ -14,37 +10,18 @@ body {
   margin-top: 10px;
   margin-bottom: 20px;
 }
-li{
-  font-size: 20px;
-  font-family: Alegreya Sans SC;
 
-}
-a{
-  color: white;
-
-}
-a:active{
-  color: #2b669a;
-  outline: none;
+.search-input {
+  width: fit-content;
+  color: black;
 }
 
-a:visited{
-  color: blueviolet;
-  outline: none;
-}
-a:hover{
-  text-decoration: underline;
+.search-button {
+  background-color: lightskyblue;
+  color: black;
 }
 
-.moviesList{
-  column-count: 3;
-  -webkit-column-count: 3;
-  -moz-column-count: 3;
-  text-decoration: underline;
-}
-.actorsList{
-  column-count: 3;
-  -webkit-column-count: 3;
-  -moz-column-count: 3;
-  text-decoration: underline;
+.sort-select {
+  width: fit-content;
+  color: black;
 }
