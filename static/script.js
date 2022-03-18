@@ -41,21 +41,21 @@ var getUniqueActors = function (movies) {
     uniqueActors.sort(function (a, b) { return a.localeCompare(b); });
     return uniqueActors;
 };
-var getMovieGenres = function (movies) {
-    var allGenres = {};
-    movies.forEach(function (movie) {
-        var myGenres = __spreadArray([], __read(new Set(movie.genres)), false);
-        myGenres.forEach(function (genre) {
-            if (allGenres[genre])
-                allGenres[genre]++;
-            else
-                allGenres[genre] = 1;
-        });
-    });
-    return allGenres;
-};
 var homePageHandler = function () {
     var $displayArea = $("#moviesInfo");
+    var getMovieGenres = function (movies) {
+        var allGenres = {};
+        movies.forEach(function (movie) {
+            var myGenres = __spreadArray([], __read(new Set(movie.genres)), false);
+            myGenres.forEach(function (genre) {
+                if (allGenres[genre])
+                    allGenres[genre]++;
+                else
+                    allGenres[genre] = 1;
+            });
+        });
+        return allGenres;
+    };
     getDataThen(function (movies) {
         var genres = getMovieGenres(movies);
         var actors = getUniqueActors(movies);

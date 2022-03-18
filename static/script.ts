@@ -26,20 +26,19 @@ const getUniqueActors = (movies: Movie[]) => {
   return uniqueActors;
 };
 
-const getMovieGenres = (movies: Movie[]) => {
-  const allGenres: { [title: string]: number } = {};
-  movies.forEach((movie) => {
-    const myGenres = [...new Set(movie.genres)];
-    myGenres.forEach((genre) => {
-      if (allGenres[genre]) allGenres[genre]++;
-      else allGenres[genre] = 1;
-    });
-  });
-  return allGenres;
-};
-
 const homePageHandler = () => {
   const $displayArea = $("#moviesInfo");
+  const getMovieGenres = (movies: Movie[]) => {
+    const allGenres: { [title: string]: number } = {};
+    movies.forEach((movie) => {
+      const myGenres = [...new Set(movie.genres)];
+      myGenres.forEach((genre) => {
+        if (allGenres[genre]) allGenres[genre]++;
+        else allGenres[genre] = 1;
+      });
+    });
+    return allGenres;
+  };
   getDataThen((movies) => {
     const genres = getMovieGenres(movies);
     const actors = getUniqueActors(movies);
