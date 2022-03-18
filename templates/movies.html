@@ -21,9 +21,9 @@
         <th scope="col" style="width: 15%">
           Year
           <br>
-          <input type="number" min="1900" max="2018" step="1" value="1900" id="yearMinInput" class="search-input" oninput="(validity.valid)||(value='1900');"/>
+          <input type="number" min="1900" max="2018" step="1" value="1900" id="yearMinInput" class="search-input" onchange="(validity.valid)||(value='1900');"/>
           -
-          <input type="number" min="1900" max="2018" step="1" value="2018" id="yearMaxInput" class="search-input" oninput="(validity.valid)||(value='2018');"/>
+          <input type="number" min="1900" max="2018" step="1" value="2018" id="yearMaxInput" class="search-input" onchange="(validity.valid)||(value='2018');"/>
         </th>
         <th scope="col" style="width: 45%">
           Cast
@@ -38,6 +38,12 @@
       </tr>
     </thead>
     <tbody id="moviesTableBody">
+      <tr>
+        <td>Loading...</td>
+        <td>Loading...</td>
+        <td>Loading...</td>
+        <td>Loading...</td>
+      </tr>
     </tbody>
   </table>
 </div>

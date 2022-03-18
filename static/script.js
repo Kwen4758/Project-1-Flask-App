@@ -120,7 +120,10 @@ var moviesPageHandler = function () {
         var sortedMovies = sortMovies(movies, $sortSelect.val());
         sortedMovies.forEach(function (_a) {
             var title = _a.title, year = _a.year, cast = _a.cast, genres = _a.genres;
-            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(cast.join(", "), "</td>\n          <td>").concat(genres.join(", "), "</td>\n        </tr>"));
+            var castLinks = cast
+                .sort(function (a, b) { return a.localeCompare(b); })
+                .map(function (actor) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a>"); });
+            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(castLinks.join(", "), "</td>\n          <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n        </tr>"));
         });
     };
     var onSearch = function (movies) {

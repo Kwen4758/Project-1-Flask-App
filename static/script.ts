@@ -103,12 +103,15 @@ const moviesPageHandler = () => {
     $movieTable.empty();
     const sortedMovies = sortMovies(movies, $sortSelect.val() as string);
     sortedMovies.forEach(({ title, year, cast, genres }) => {
+      const castLinks = cast
+        .sort((a, b) => a.localeCompare(b))
+        .map((actor) => `<a href="${ORIGIN}/actor/${actor}">${actor}</a>`);
       $movieTable.append(
         `<tr>
           <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
           <td>${year}</td>
-          <td>${cast.join(", ")}</td>
-          <td>${genres.join(", ")}</td>
+          <td>${castLinks.join(", ")}</td>
+          <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
         </tr>`
       );
     });
