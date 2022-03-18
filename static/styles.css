@@ -12,7 +12,12 @@ body {
 }
 
 .search-input {
-  width: 20vw;
+  width: fit-content;
+  color: black;
+}
+
+.search-button {
+  background-color: lightskyblue;
   color: black;
 }
 

@@ -91,10 +91,14 @@ var actorsPageHandler = function () {
     });
 };
 var moviesPageHandler = function () {
-    var $displayArea = $("#moviesList");
-    var $yearInput = $("#yearInput");
+    var $movieTable = $("#moviesTableBody");
+    var $yearMinInput = $("#yearMinInput");
+    var $yearMaxInput = $("#yearMaxInput");
     var $titleInput = $("#titleInput");
-    var $sortInput = $("#sortInput");
+    var $castInput = $("#castInput");
+    var $genreInput = $("#genreInput");
+    var $sortSelect = $("#sortInput");
+    var $searchButton = $("#searchButton");
     var sortMovies = function (rawMovies, sortType) {
         var sortedMovies = __spreadArray([], __read(rawMovies), false);
         if (sortType === "title_d") {
@@ -112,32 +116,36 @@ var moviesPageHandler = function () {
         return sortedMovies;
     };
     var fillUi = function (movies) {
-        $displayArea.empty();
-        var sortedMovies = sortMovies(movies, $sortInput.val());
-        var movieTitles = sortedMovies.map(function (movie) { return movie.title; });
-        movieTitles.forEach(function (title) {
-            $displayArea.append("<li><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></li>"));
+        $movieTable.empty();
+        var sortedMovies = sortMovies(movies, $sortSelect.val());
+        sortedMovies.forEach(function (_a) {
+            var title = _a.title, year = _a.year, cast = _a.cast, genres = _a.genres;
+            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(cast.join(", "), "</td>\n          <td>").concat(genres.join(", "), "</td>\n        </tr>"));
         });
     };
-    var onInputChange = function (movies) {
+    var onSearch = function (movies) {
         var titleFilter = $titleInput.val().toString().toLowerCase();
-        var yearFilter = +$yearInput.val();
-        var resolvedMovies = movies.filter(function (movie) {
-            if (yearFilter > 1000 && yearFilter < 3000) {
-                if (movie.year !== yearFilter)
-                    return false;
-            }
-            if (movie.title.toLowerCase().includes(titleFilter))
-                return true;
-            else
+        var yearMinFilter = +$yearMinInput.val();
+        var yearMaxFilter = +$yearMaxInput.val();
+        var castFilter = $castInput.val().toString().toLowerCase();
+        var genreFilter = $genreInput.val().toString().toLowerCase();
+        var resolvedMovies = movies.filter(function (_a) {
+            var title = _a.title, year = _a.year, cast = _a.cast, genres = _a.genres;
+            if (!title.toLowerCase().includes(titleFilter))
                 return false;
+            if (year < yearMinFilter || year > yearMaxFilter)
+                return false;
+            if (!cast.reduce(function (pre, cur) { return pre || cur.toLowerCase().includes(castFilter); }, false))
+                return false;
+            if (!genres.reduce(function (pre, cur) { return pre || cur.toLowerCase().includes(genreFilter); }, false))
+                return false;
+            return true;
         });
         fillUi(resolvedMovies);
     };
     getDataThen(function (movies) {
-        $yearInput.on("input", function () { return onInputChange(movies); });
-        $titleInput.on("input", function () { return onInputChange(movies); });
-        $sortInput.on("change", function () { return fillUi(movies); });
+        $searchButton.on("click", function () { return onSearch(movies); });
+        $sortSelect.on("change", function () { return onSearch(movies); });
         fillUi(movies);
     });
 };

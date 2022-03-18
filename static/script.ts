@@ -78,10 +78,14 @@ const actorsPageHandler = () => {
 };
 
 const moviesPageHandler = () => {
-  const $displayArea = $("#moviesList");
-  const $yearInput = $("#yearInput");
+  const $movieTable = $("#moviesTableBody");
+  const $yearMinInput = $("#yearMinInput");
+  const $yearMaxInput = $("#yearMaxInput");
   const $titleInput = $("#titleInput");
-  const $sortInput = $("#sortInput");
+  const $castInput = $("#castInput");
+  const $genreInput = $("#genreInput");
+  const $sortSelect = $("#sortInput");
+  const $searchButton = $("#searchButton");
   const sortMovies = (rawMovies: Movie[], sortType: string) => {
     const sortedMovies = [...rawMovies];
     if (sortType === "title_d") {
@@ -96,31 +100,49 @@ const moviesPageHandler = () => {
     return sortedMovies;
   };
   const fillUi = (movies: Movie[]) => {
-    $displayArea.empty();
-    const sortedMovies = sortMovies(movies, $sortInput.val() as string);
-    const movieTitles = sortedMovies.map((movie) => movie.title);
-    movieTitles.forEach((title) => {
-      $displayArea.append(
-        `<li><a href="${ORIGIN}/movie/${title}">${title}</a></li>`
+    $movieTable.empty();
+    const sortedMovies = sortMovies(movies, $sortSelect.val() as string);
+    sortedMovies.forEach(({ title, year, cast, genres }) => {
+      $movieTable.append(
+        `<tr>
+          <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
+          <td>${year}</td>
+          <td>${cast.join(", ")}</td>
+          <td>${genres.join(", ")}</td>
+        </tr>`
       );
     });
   };
-  const onInputChange = (movies: Movie[]) => {
+  const onSearch = (movies: Movie[]) => {
     const titleFilter = $titleInput.val().toString().toLowerCase();
-    const yearFilter = +$yearInput.val();
-    const resolvedMovies = movies.filter((movie) => {
-      if (yearFilter > 1000 && yearFilter < 3000) {
-        if (movie.year !== yearFilter) return false;
-      }
-      if (movie.title.toLowerCase().includes(titleFilter)) return true;
-      else return false;
+    const yearMinFilter = +$yearMinInput.val();
+    const yearMaxFilter = +$yearMaxInput.val();
+    const castFilter = $castInput.val().toString().toLowerCase();
+    const genreFilter = $genreInput.val().toString().toLowerCase();
+    const resolvedMovies = movies.filter(({ title, year, cast, genres }) => {
+      if (!title.toLowerCase().includes(titleFilter)) return false;
+      if (year < yearMinFilter || year > yearMaxFilter) return false;
+      if (
+        !cast.reduce(
+          (pre, cur) => pre || cur.toLowerCase().includes(castFilter),
+          false
+        )
+      )
+        return false;
+      if (
+        !genres.reduce(
+          (pre, cur) => pre || cur.toLowerCase().includes(genreFilter),
+          false
+        )
+      )
+        return false;
+      return true;
     });
     fillUi(resolvedMovies);
   };
   getDataThen((movies) => {
-    $yearInput.on("input", () => onInputChange(movies));
-    $titleInput.on("input", () => onInputChange(movies));
-    $sortInput.on("change", () => fillUi(movies));
+    $searchButton.on("click", () => onSearch(movies));
+    $sortSelect.on("change", () => onSearch(movies));
     fillUi(movies);
   });
 };
