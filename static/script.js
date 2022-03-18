@@ -23,10 +23,11 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+var ORIGIN = window.location.origin;
 var getDataThen = function (onSuccess) {
     $.ajax({
         type: "GET",
-        url: "".concat(window.location.origin, "/static/movies.json"),
+        url: "".concat(ORIGIN, "/static/movies.json"),
         dataType: "json",
         success: onSuccess,
     });
@@ -37,7 +38,7 @@ var getUniqueActors = function (movies) {
         allActorsWithDuplicates.push.apply(allActorsWithDuplicates, __spreadArray([], __read(movie.cast), false));
     });
     var uniqueActors = __spreadArray([], __read(new Set(allActorsWithDuplicates)), false);
-    uniqueActors.sort();
+    uniqueActors.sort(function (a, b) { return a.localeCompare(b); });
     return uniqueActors;
 };
 var getMovieGenres = function (movies) {
@@ -69,30 +70,84 @@ var homePageHandler = function () {
 };
 var actorsPageHandler = function () {
     var $displayArea = $("#actorsList");
+    var $nameInput = $("#nameInput");
+    var fillUi = function (actors) {
+        $displayArea.empty();
+        actors.forEach(function (actor) {
+            $displayArea.append("<li><a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a></li>"));
+        });
+    };
+    var onInputChange = function (actors) {
+        var nameFilter = $nameInput.val().toString().toLowerCase();
+        var resolvedActors = actors.filter(function (name) {
+            return name.toLowerCase().includes(nameFilter);
+        });
+        fillUi(resolvedActors);
+    };
     getDataThen(function (movies) {
         var uniqueActors = getUniqueActors(movies);
-        uniqueActors.forEach(function (actor) {
-            $displayArea.append("<li><a href=\"".concat(window.location.origin, "/actor/").concat(actor, "\">").concat(actor, "</a></li>"));
-        });
+        $nameInput.on("input", function () { return onInputChange(uniqueActors); });
+        fillUi(uniqueActors);
     });
 };
 var moviesPageHandler = function () {
     var $displayArea = $("#moviesList");
-    getDataThen(function (movies) {
-        var movieTitles = movies.map(function (movie) { return movie.title; }).sort();
+    var $yearInput = $("#yearInput");
+    var $titleInput = $("#titleInput");
+    var $sortInput = $("#sortInput");
+    var sortMovies = function (rawMovies, sortType) {
+        var sortedMovies = __spreadArray([], __read(rawMovies), false);
+        if (sortType === "title_d") {
+            sortedMovies.sort(function (a, b) { return a.title.localeCompare(b.title); });
+        }
+        else if (sortType === "title_a") {
+            sortedMovies.sort(function (a, b) { return b.title.localeCompare(a.title); });
+        }
+        else if (sortType === "year_d") {
+            sortedMovies.sort(function (a, b) { return a.year - b.year; });
+        }
+        else if (sortType === "year_a") {
+            sortedMovies.sort(function (a, b) { return b.year - a.year; });
+        }
+        return sortedMovies;
+    };
+    var fillUi = function (movies) {
+        $displayArea.empty();
+        var sortedMovies = sortMovies(movies, $sortInput.val());
+        var movieTitles = sortedMovies.map(function (movie) { return movie.title; });
         movieTitles.forEach(function (title) {
-            $displayArea.append("<li><a href=\"".concat(window.location.origin, "/movie/").concat(title, "\">").concat(title, "</a></li>"));
+            $displayArea.append("<li><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></li>"));
         });
+    };
+    var onInputChange = function (movies) {
+        var titleFilter = $titleInput.val().toString().toLowerCase();
+        var yearFilter = +$yearInput.val();
+        var resolvedMovies = movies.filter(function (movie) {
+            if (yearFilter > 1000 && yearFilter < 3000) {
+                if (movie.year !== yearFilter)
+                    return false;
+            }
+            if (movie.title.toLowerCase().includes(titleFilter))
+                return true;
+            else
+                return false;
+        });
+        fillUi(resolvedMovies);
+    };
+    getDataThen(function (movies) {
+        $yearInput.on("input", function () { return onInputChange(movies); });
+        $titleInput.on("input", function () { return onInputChange(movies); });
+        $sortInput.on("change", function () { return fillUi(movies); });
+        fillUi(movies);
     });
 };
 var actorPageHandler = function (actor) {
     var $displayArea = $("#actorInfo");
     getDataThen(function (movies) {
-        console.log(actor);
         var myMovies = movies.filter(function (movie) { return movie.cast.includes(actor); });
         __spreadArray([], __read(new Set(myMovies)), false).forEach(function (movie) {
             var title = movie.title;
-            $displayArea.append("<li><a href=\"".concat(window.location.origin, "/movie/").concat(title, "\">").concat(title, "</a></li>"));
+            $displayArea.append("<li><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></li>"));
         });
     });
 };
@@ -112,7 +167,7 @@ var moviePageHandler = function (movieTitle) {
         if (actors.length > 0) {
             $displayArea.append("<li>Movie Cast (".concat(actors.length, " actors):</li>"));
             actors.forEach(function (actor) {
-                $displayArea.append("<li><a href=\"".concat(window.location.origin, "/actor/").concat(actor, "\">").concat(actor, "</a></li>"));
+                $displayArea.append("<li><a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a></li>"));
             });
         }
     });

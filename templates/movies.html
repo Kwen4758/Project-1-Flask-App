@@ -2,6 +2,14 @@
 <div class="container">
   <div class="text-center">
     <h1>Movies</h1>
+    <input type="search" placeholder="Search by Title" id="titleInput" class="search-input"/>
+    <input type="number" min="1900" max="2018" placeholder="Search by Year" id="yearInput" class="search-input"/>
+    <select id="sortInput" class="sort-select"> 
+      <option value="title_d" label="Sort by Title A-Z">
+      <option value="title_a" label="Sort by Title Z-A">
+      <option value="year_d" label="Sort by Year 1990-2018">
+      <option value="year_a" label="Sort by Year 2018-1990">
+    </select>
   </div>
   <ul id="moviesList"></ul>
 </div>

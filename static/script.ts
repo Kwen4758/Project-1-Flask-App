@@ -5,10 +5,12 @@ interface Movie {
   genres: string[];
 }
 
+const ORIGIN = window.location.origin;
+
 const getDataThen = (onSuccess: (movies: Movie[]) => void) => {
   $.ajax({
     type: "GET",
-    url: `${window.location.origin}/static/movies.json`,
+    url: `${ORIGIN}/static/movies.json`,
     dataType: "json",
     success: onSuccess,
   });
@@ -20,7 +22,7 @@ const getUniqueActors = (movies: Movie[]) => {
     allActorsWithDuplicates.push(...movie.cast);
   });
   const uniqueActors = [...new Set(allActorsWithDuplicates)];
-  uniqueActors.sort();
+  uniqueActors.sort((a, b) => a.localeCompare(b));
   return uniqueActors;
 };
 
@@ -52,37 +54,85 @@ const homePageHandler = () => {
 
 const actorsPageHandler = () => {
   const $displayArea = $("#actorsList");
-  getDataThen((movies) => {
-    const uniqueActors = getUniqueActors(movies);
-    uniqueActors.forEach((actor) => {
+  const $nameInput = $("#nameInput");
+  const fillUi = (actors: string[]) => {
+    $displayArea.empty();
+    actors.forEach((actor) => {
       $displayArea.append(
-        `<li><a href="${window.location.origin}/actor/${actor}">${actor}</a></li>`
+        `<li><a href="${ORIGIN}/actor/${actor}">${actor}</a></li>`
       );
     });
+  };
+  const onInputChange = (actors: string[]) => {
+    const nameFilter = $nameInput.val().toString().toLowerCase();
+    const resolvedActors = actors.filter((name) =>
+      name.toLowerCase().includes(nameFilter)
+    );
+    fillUi(resolvedActors);
+  };
+  getDataThen((movies) => {
+    const uniqueActors = getUniqueActors(movies);
+    $nameInput.on("input", () => onInputChange(uniqueActors));
+    fillUi(uniqueActors);
   });
 };
 
 const moviesPageHandler = () => {
   const $displayArea = $("#moviesList");
-  getDataThen((movies) => {
-    const movieTitles = movies.map((movie) => movie.title).sort();
+  const $yearInput = $("#yearInput");
+  const $titleInput = $("#titleInput");
+  const $sortInput = $("#sortInput");
+  const sortMovies = (rawMovies: Movie[], sortType: string) => {
+    const sortedMovies = [...rawMovies];
+    if (sortType === "title_d") {
+      sortedMovies.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortType === "title_a") {
+      sortedMovies.sort((a, b) => b.title.localeCompare(a.title));
+    } else if (sortType === "year_d") {
+      sortedMovies.sort((a, b) => a.year - b.year);
+    } else if (sortType === "year_a") {
+      sortedMovies.sort((a, b) => b.year - a.year);
+    }
+    return sortedMovies;
+  };
+  const fillUi = (movies: Movie[]) => {
+    $displayArea.empty();
+    const sortedMovies = sortMovies(movies, $sortInput.val() as string);
+    const movieTitles = sortedMovies.map((movie) => movie.title);
     movieTitles.forEach((title) => {
       $displayArea.append(
-        `<li><a href="${window.location.origin}/movie/${title}">${title}</a></li>`
+        `<li><a href="${ORIGIN}/movie/${title}">${title}</a></li>`
       );
     });
+  };
+  const onInputChange = (movies: Movie[]) => {
+    const titleFilter = $titleInput.val().toString().toLowerCase();
+    const yearFilter = +$yearInput.val();
+    const resolvedMovies = movies.filter((movie) => {
+      if (yearFilter > 1000 && yearFilter < 3000) {
+        if (movie.year !== yearFilter) return false;
+      }
+      if (movie.title.toLowerCase().includes(titleFilter)) return true;
+      else return false;
+    });
+    fillUi(resolvedMovies);
+  };
+  getDataThen((movies) => {
+    $yearInput.on("input", () => onInputChange(movies));
+    $titleInput.on("input", () => onInputChange(movies));
+    $sortInput.on("change", () => fillUi(movies));
+    fillUi(movies);
   });
 };
 
 const actorPageHandler = (actor: string) => {
   const $displayArea = $("#actorInfo");
   getDataThen((movies) => {
-    console.log(actor);
     const myMovies = movies.filter((movie) => movie.cast.includes(actor));
     [...new Set(myMovies)].forEach((movie) => {
       const title = movie.title;
       $displayArea.append(
-        `<li><a href="${window.location.origin}/movie/${title}">${title}</a></li>`
+        `<li><a href="${ORIGIN}/movie/${title}">${title}</a></li>`
       );
     });
   });
@@ -105,7 +155,7 @@ const moviePageHandler = (movieTitle: string) => {
       $displayArea.append(`<li>Movie Cast (${actors.length} actors):</li>`);
       actors.forEach((actor) => {
         $displayArea.append(
-          `<li><a href="${window.location.origin}/actor/${actor}">${actor}</a></li>`
+          `<li><a href="${ORIGIN}/actor/${actor}">${actor}</a></li>`
         );
       });
     }

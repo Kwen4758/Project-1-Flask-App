@@ -10,3 +10,13 @@ body {
   margin-top: 10px;
   margin-bottom: 20px;
 }
+
+.search-input {
+  width: 20vw;
+  color: black;
+}
+
+.sort-select {
+  width: fit-content;
+  color: black;
+}
