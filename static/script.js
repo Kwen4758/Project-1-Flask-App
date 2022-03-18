@@ -59,12 +59,12 @@ var homePageHandler = function () {
     getDataThen(function (movies) {
         var genres = getMovieGenres(movies);
         var actors = getUniqueActors(movies);
-        $displayArea.append("<li>Number of Actors: ".concat(actors.length, "</li>"));
-        $displayArea.append("<li>Number of Movies: ".concat(movies.length, "</li>"));
+        $displayArea.append("<li>Number of Actors: <span style=\"color: red\">".concat(actors.length, "</span> </li>"));
+        $displayArea.append("<li>Number of Movies: <span style=\"color: red\"> ".concat(movies.length, "</span></li>"));
         $displayArea.append("<li>Number of Movies in Each Genre:</li>");
         Object.entries(genres).forEach(function (_a) {
             var _b = __read(_a, 2), genre = _b[0], count = _b[1];
-            $displayArea.append("<li>Number of ".concat(genre, " Movies: ").concat(count, "</li>"));
+            $displayArea.append("<li>Number of ".concat(genre, " Movies: <span style=\"color: red\">").concat(count, "</span> </li>"));
         });
     });
 };
@@ -123,7 +123,7 @@ var moviesPageHandler = function () {
             var castLinks = cast
                 .sort(function (a, b) { return a.localeCompare(b); })
                 .map(function (actor) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a>"); });
-            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(castLinks.join(", "), "</td>\n          <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n        </tr>"));
+            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\"><em>").concat(title, "</em></a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(castLinks.join(", "), "</td>\n          <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n        </tr>"));
         });
     };
     var onSearch = function (movies) {

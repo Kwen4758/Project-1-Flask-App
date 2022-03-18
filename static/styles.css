@@ -2,6 +2,10 @@ body {
   padding-top: 60px;
   background-color: black;
   color: white;
+  background-image: url("moviebackground.jpg");
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 .main-pic {
@@ -24,4 +28,26 @@ body {
 .sort-select {
   width: fit-content;
   color: black;
+}
+}
+a{
+  color: white;
+
+}
+a:active{
+  color: #2b669a;
+  outline: none;
+}
+
+a:visited{
+  color: blueviolet;
+  outline: none;
+}
+a:hover{
+  text-decoration: underline;
+}
+li{
+  font-size: 20px;
+  font-family: Alegreya Sans SC;
+
 }

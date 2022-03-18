@@ -42,11 +42,11 @@ const homePageHandler = () => {
   getDataThen((movies) => {
     const genres = getMovieGenres(movies);
     const actors = getUniqueActors(movies);
-    $displayArea.append(`<li>Number of Actors: ${actors.length}</li>`);
-    $displayArea.append(`<li>Number of Movies: ${movies.length}</li>`);
+    $displayArea.append(`<li>Number of Actors: <span style="color: red">${actors.length}</span> </li>`);
+    $displayArea.append(`<li>Number of Movies: <span style="color: red"> ${movies.length}</span></li>`);
     $displayArea.append(`<li>Number of Movies in Each Genre:</li>`);
     Object.entries(genres).forEach(([genre, count]) => {
-      $displayArea.append(`<li>Number of ${genre} Movies: ${count}</li>`);
+     $displayArea.append(`<li>Number of ${genre} Movies: <span style="color: red">${count}</span> </li>`);
     });
   });
 };
@@ -107,7 +107,7 @@ const moviesPageHandler = () => {
         .map((actor) => `<a href="${ORIGIN}/actor/${actor}">${actor}</a>`);
       $movieTable.append(
         `<tr>
-          <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
+          <td><a href="${ORIGIN}/movie/${title}"><em>${title}</em></a></td>
           <td>${year}</td>
           <td>${castLinks.join(", ")}</td>
           <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
