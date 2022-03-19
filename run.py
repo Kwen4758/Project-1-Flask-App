@@ -8,7 +8,7 @@ Bootstrap(app)
 @app.route("/index")
 @app.route("/")
 def index():
-    return render_template('index.html', index='true')
+    return render_template('home.html', index='true')
 
 
 @app.route("/actors")
