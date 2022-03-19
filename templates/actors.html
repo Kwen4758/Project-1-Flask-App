@@ -2,9 +2,36 @@
 <div class="container">
   <div class="text-center">
     <h1>Actors</h1>
-    <input type="search" placeholder="Search by Name" id="nameInput" class="search-input"/>
+    <button class="search-button" id="searchButton">Perform Search</button>
   </div>
-  <ul id="actorsList"></ul>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 30%">
+          Name
+          <br>
+          <input type="search" placeholder="Name" id="nameInput" class="search-input"/>
+        </th>
+        <th scope="col" style="width: 40%">
+          Movies
+          <br>
+          <input type="search" placeholder="Movie" id="movieInput" class="search-input"/>
+        </th>
+        <th scope="col" style="width: 30%">
+          Genres
+          <br>
+          <input type="search" placeholder="Genre" id="genreInput" class="search-input"/>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="actorsTableBody">
+      <tr>
+        <td>Loading...</td>
+        <td>Loading...</td>
+        <td>Loading...</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 {% endblock %}
 

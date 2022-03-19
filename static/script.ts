@@ -5,6 +5,13 @@ interface Movie {
   genres: string[];
 }
 
+interface Actor {
+  name: string;
+  movies: Movie[];
+  yearsActive: number[];
+  genres: string[];
+}
+
 const ORIGIN = window.location.origin;
 
 const getDataThen = (onSuccess: (movies: Movie[]) => void) => {
@@ -16,14 +23,34 @@ const getDataThen = (onSuccess: (movies: Movie[]) => void) => {
   });
 };
 
-const getUniqueActors = (movies: Movie[]) => {
-  const allActorsWithDuplicates: string[] = [];
+const getUniqueActors = (movies: Movie[]): Actor[] => {
+  const partialActors: { [name: string]: { name: string; movies: Movie[] } } =
+    {};
   movies.forEach((movie) => {
-    allActorsWithDuplicates.push(...movie.cast);
+    movie.cast.forEach((name) => {
+      if (!partialActors[name]) partialActors[name] = { name, movies: [movie] };
+      else partialActors[name].movies.push(movie);
+    });
   });
-  const uniqueActors = [...new Set(allActorsWithDuplicates)];
-  uniqueActors.sort((a, b) => a.localeCompare(b));
-  return uniqueActors;
+  const finalActors: Actor[] = Object.values(partialActors).map(
+    ({ name, movies }) => {
+      const dupeGenres: string[] = [];
+      const dupeYears: number[] = [];
+      movies.sort((a, b) => a.title.localeCompare(b.title));
+      movies.forEach((movie) => {
+        dupeGenres.push(...movie.genres);
+        dupeYears.push(movie.year);
+      });
+      return {
+        name,
+        movies,
+        yearsActive: [...new Set(dupeYears)].sort(),
+        genres: [...new Set(dupeGenres)].sort((a, b) => a.localeCompare(b)),
+      };
+    }
+  );
+  finalActors.sort((a, b) => a.name.localeCompare(b.name));
+  return finalActors;
 };
 
 const homePageHandler = () => {
@@ -52,26 +79,53 @@ const homePageHandler = () => {
 };
 
 const actorsPageHandler = () => {
-  const $displayArea = $("#actorsList");
+  const $actorsTable = $("#actorsTableBody");
   const $nameInput = $("#nameInput");
-  const fillUi = (actors: string[]) => {
-    $displayArea.empty();
-    actors.forEach((actor) => {
-      $displayArea.append(
-        `<li><a href="${ORIGIN}/actor/${actor}">${actor}</a></li>`
+  const $genreInput = $("#genreInput");
+  const $movieInput = $("#movieInput");
+  const $searchButton = $("#searchButton");
+  const fillUi = (actors: Actor[]) => {
+    $actorsTable.empty();
+    actors.forEach(({ name, movies, genres }) => {
+      const movieLinks = movies
+        .sort((a, b) => a.title.localeCompare(b.title))
+        .map(({ title }) => `<a href="${ORIGIN}/movie/${title}">${title}</a>`);
+      $actorsTable.append(
+        `<tr>
+          <td><a href="${ORIGIN}/actor/${name}">${name}</a></td>
+          <td>${movieLinks.join(", ")}</td>
+          <td>${genres.join(", ")}</td>
+        </tr>`
       );
     });
   };
-  const onInputChange = (actors: string[]) => {
+  const onSearch = (actors: Actor[]) => {
     const nameFilter = $nameInput.val().toString().toLowerCase();
-    const resolvedActors = actors.filter((name) =>
-      name.toLowerCase().includes(nameFilter)
-    );
+    const movieFilter = $movieInput.val().toString().toLowerCase();
+    const genreFilter = $genreInput.val().toString().toLowerCase();
+    const resolvedActors = actors.filter(({ name, movies, genres }) => {
+      if (!name.toLowerCase().includes(nameFilter)) return false;
+      if (
+        !movies.reduce(
+          (pre, cur) => pre || cur.title.toLowerCase().includes(movieFilter),
+          false
+        )
+      )
+        return false;
+      if (
+        !genres.reduce(
+          (pre, cur) => pre || cur.toLowerCase().includes(genreFilter),
+          false
+        )
+      )
+        return false;
+      return true;
+    });
     fillUi(resolvedActors);
   };
   getDataThen((movies) => {
     const uniqueActors = getUniqueActors(movies);
-    $nameInput.on("input", () => onInputChange(uniqueActors));
+    $searchButton.on("click", () => onSearch(uniqueActors));
     fillUi(uniqueActors);
   });
 };
@@ -153,8 +207,7 @@ const actorPageHandler = (actor: string) => {
   const $displayArea = $("#actorInfo");
   getDataThen((movies) => {
     const myMovies = movies.filter((movie) => movie.cast.includes(actor));
-    [...new Set(myMovies)].forEach((movie) => {
-      const title = movie.title;
+    [...new Set(myMovies)].forEach(({ title }) => {
       $displayArea.append(
         `<li><a href="${ORIGIN}/movie/${title}">${title}</a></li>`
       );
@@ -166,8 +219,10 @@ const moviePageHandler = (movieTitle: string) => {
   const $displayArea = $("#movieInfo");
   getDataThen((movies) => {
     const movie = movies.find((movie) => movie.title === movieTitle);
-    const actors = [...new Set(movie.cast)];
-    const genres = [...new Set(movie.genres)];
+    const actors = [...new Set(movie.cast)].sort((a, b) => a.localeCompare(b));
+    const genres = [...new Set(movie.genres)].sort((a, b) =>
+      a.localeCompare(b)
+    );
     $displayArea.append(`<li>Year Released: ${movie.year}</li>`);
     if (genres.length > 0) {
       $displayArea.append(`<li>Movie Genres:</li>`);
