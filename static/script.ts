@@ -84,18 +84,26 @@ const actorsPageHandler = () => {
   const $genreInput = $("#genreInput");
   const $movieInput = $("#movieInput");
   const $searchButton = $("#searchButton");
+  const timeouts: NodeJS.Timeout[] = [];
   const fillUi = (actors: Actor[]) => {
+    timeouts.forEach((timeout) => clearTimeout(timeout));
     $actorsTable.empty();
     actors.forEach(({ name, movies, genres }) => {
-      const movieLinks = movies
-        .sort((a, b) => a.title.localeCompare(b.title))
-        .map(({ title }) => `<a href="${ORIGIN}/movie/${title}">${title}</a>`);
-      $actorsTable.append(
-        `<tr>
-          <td><a href="${ORIGIN}/actor/${name}">${name}</a></td>
-          <td>${movieLinks.join(", ")}</td>
-          <td>${genres.join(", ")}</td>
-        </tr>`
+      timeouts.push(
+        setTimeout(() => {
+          const movieLinks = movies
+            .sort((a, b) => a.title.localeCompare(b.title))
+            .map(
+              ({ title }) => `<a href="${ORIGIN}/movie/${title}">${title}</a>`
+            );
+          $actorsTable.append(
+            `<tr>
+              <td><a href="${ORIGIN}/actor/${name}">${name}</a></td>
+              <td>${movieLinks.join(", ")}</td>
+              <td>${genres.join(", ")}</td>
+            </tr>`
+          );
+        }, 0)
       );
     });
   };
@@ -139,6 +147,7 @@ const moviesPageHandler = () => {
   const $genreInput = $("#genreInput");
   const $sortSelect = $("#sortInput");
   const $searchButton = $("#searchButton");
+  const timeouts: NodeJS.Timeout[] = [];
   const sortMovies = (rawMovies: Movie[], sortType: string) => {
     const sortedMovies = [...rawMovies];
     if (sortType === "title_d") {
@@ -153,19 +162,24 @@ const moviesPageHandler = () => {
     return sortedMovies;
   };
   const fillUi = (movies: Movie[]) => {
+    timeouts.forEach((timeout) => clearTimeout(timeout));
     $movieTable.empty();
     const sortedMovies = sortMovies(movies, $sortSelect.val() as string);
     sortedMovies.forEach(({ title, year, cast, genres }) => {
-      const castLinks = cast
-        .sort((a, b) => a.localeCompare(b))
-        .map((actor) => `<a href="${ORIGIN}/actor/${actor}">${actor}</a>`);
-      $movieTable.append(
-        `<tr>
-          <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
-          <td>${year}</td>
-          <td>${castLinks.join(", ")}</td>
-          <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
-        </tr>`
+      timeouts.push(
+        setTimeout(() => {
+          const castLinks = cast
+            .sort((a, b) => a.localeCompare(b))
+            .map((actor) => `<a href="${ORIGIN}/actor/${actor}">${actor}</a>`);
+          $movieTable.append(
+            `<tr>
+            <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
+            <td>${year}</td>
+            <td>${castLinks.join(", ")}</td>
+            <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
+          </tr>`
+          );
+        }, 0)
       );
     });
   };

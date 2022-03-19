@@ -94,17 +94,21 @@ var actorsPageHandler = function () {
     var $genreInput = $("#genreInput");
     var $movieInput = $("#movieInput");
     var $searchButton = $("#searchButton");
+    var timeouts = [];
     var fillUi = function (actors) {
+        timeouts.forEach(function (timeout) { return clearTimeout(timeout); });
         $actorsTable.empty();
         actors.forEach(function (_a) {
             var name = _a.name, movies = _a.movies, genres = _a.genres;
-            var movieLinks = movies
-                .sort(function (a, b) { return a.title.localeCompare(b.title); })
-                .map(function (_a) {
-                var title = _a.title;
-                return "<a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a>");
-            });
-            $actorsTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/actor/").concat(name, "\">").concat(name, "</a></td>\n          <td>").concat(movieLinks.join(", "), "</td>\n          <td>").concat(genres.join(", "), "</td>\n        </tr>"));
+            timeouts.push(setTimeout(function () {
+                var movieLinks = movies
+                    .sort(function (a, b) { return a.title.localeCompare(b.title); })
+                    .map(function (_a) {
+                    var title = _a.title;
+                    return "<a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a>");
+                });
+                $actorsTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/actor/").concat(name, "\">").concat(name, "</a></td>\n              <td>").concat(movieLinks.join(", "), "</td>\n              <td>").concat(genres.join(", "), "</td>\n            </tr>"));
+            }, 0));
         });
     };
     var onSearch = function (actors) {
@@ -138,6 +142,7 @@ var moviesPageHandler = function () {
     var $genreInput = $("#genreInput");
     var $sortSelect = $("#sortInput");
     var $searchButton = $("#searchButton");
+    var timeouts = [];
     var sortMovies = function (rawMovies, sortType) {
         var sortedMovies = __spreadArray([], __read(rawMovies), false);
         if (sortType === "title_d") {
@@ -155,14 +160,17 @@ var moviesPageHandler = function () {
         return sortedMovies;
     };
     var fillUi = function (movies) {
+        timeouts.forEach(function (timeout) { return clearTimeout(timeout); });
         $movieTable.empty();
         var sortedMovies = sortMovies(movies, $sortSelect.val());
         sortedMovies.forEach(function (_a) {
             var title = _a.title, year = _a.year, cast = _a.cast, genres = _a.genres;
-            var castLinks = cast
-                .sort(function (a, b) { return a.localeCompare(b); })
-                .map(function (actor) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a>"); });
-            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(castLinks.join(", "), "</td>\n          <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n        </tr>"));
+            timeouts.push(setTimeout(function () {
+                var castLinks = cast
+                    .sort(function (a, b) { return a.localeCompare(b); })
+                    .map(function (actor) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a>"); });
+                $movieTable.append("<tr>\n            <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n            <td>").concat(year, "</td>\n            <td>").concat(castLinks.join(", "), "</td>\n            <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n          </tr>"));
+            }, 0));
         });
     };
     var onSearch = function (movies) {
