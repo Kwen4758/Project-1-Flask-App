@@ -15,13 +15,3 @@ body {
   width: fit-content;
   color: black;
 }
-
-.search-button {
-  background-color: lightskyblue;
-  color: black;
-}
-
-.sort-select {
-  width: fit-content;
-  color: black;
-}
