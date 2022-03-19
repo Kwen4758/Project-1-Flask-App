@@ -61,6 +61,12 @@ var getUniqueActors = function (movies) {
     finalActors.sort(function (a, b) { return a.name.localeCompare(b.name); });
     return finalActors;
 };
+var yearChangeChecker = function ($inputElement) {
+    if (+$inputElement.val() < 1900)
+        $inputElement.val(1900);
+    if (+$inputElement.val() > 2018)
+        $inputElement.val(2018);
+};
 var homePageHandler = function () {
     var $displayArea = $("#moviesInfo");
     var getMovieGenres = function (movies) {
@@ -93,10 +99,10 @@ var actorsPageHandler = function () {
     var $nameInput = $("#nameInput");
     var $genreInput = $("#genreInput");
     var $movieInput = $("#movieInput");
-    var $searchButton = $("#searchButton");
     var timeouts = [];
     var fillUi = function (actors) {
         timeouts.forEach(function (timeout) { return clearTimeout(timeout); });
+        timeouts.length = 0;
         $actorsTable.empty();
         actors.forEach(function (_a) {
             var name = _a.name, movies = _a.movies, genres = _a.genres;
@@ -129,7 +135,9 @@ var actorsPageHandler = function () {
     };
     getDataThen(function (movies) {
         var uniqueActors = getUniqueActors(movies);
-        $searchButton.on("click", function () { return onSearch(uniqueActors); });
+        $nameInput.on("input", function () { return onSearch(uniqueActors); });
+        $genreInput.on("input", function () { return onSearch(uniqueActors); });
+        $movieInput.on("input", function () { return onSearch(uniqueActors); });
         fillUi(uniqueActors);
     });
 };
@@ -141,7 +149,6 @@ var moviesPageHandler = function () {
     var $castInput = $("#castInput");
     var $genreInput = $("#genreInput");
     var $sortSelect = $("#sortInput");
-    var $searchButton = $("#searchButton");
     var timeouts = [];
     var sortMovies = function (rawMovies, sortType) {
         var sortedMovies = __spreadArray([], __read(rawMovies), false);
@@ -161,6 +168,7 @@ var moviesPageHandler = function () {
     };
     var fillUi = function (movies) {
         timeouts.forEach(function (timeout) { return clearTimeout(timeout); });
+        timeouts.length = 0;
         $movieTable.empty();
         var sortedMovies = sortMovies(movies, $sortSelect.val());
         sortedMovies.forEach(function (_a) {
@@ -169,7 +177,7 @@ var moviesPageHandler = function () {
                 var castLinks = cast
                     .sort(function (a, b) { return a.localeCompare(b); })
                     .map(function (actor) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a>"); });
-                $movieTable.append("<tr>\n            <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n            <td>").concat(year, "</td>\n            <td>").concat(castLinks.join(", "), "</td>\n            <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n          </tr>"));
+                $movieTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n              <td>").concat(year, "</td>\n              <td>").concat(castLinks.join(", "), "</td>\n              <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n            </tr>"));
             }, 0));
         });
     };
@@ -194,8 +202,17 @@ var moviesPageHandler = function () {
         fillUi(resolvedMovies);
     };
     getDataThen(function (movies) {
-        $searchButton.on("click", function () { return onSearch(movies); });
+        var yearHandler = function () {
+            yearChangeChecker($yearMaxInput);
+            yearChangeChecker($yearMinInput);
+            onSearch(movies);
+        };
         $sortSelect.on("change", function () { return onSearch(movies); });
+        $yearMinInput.on("change", function () { return yearHandler(); });
+        $yearMaxInput.on("change", function () { return yearHandler(); });
+        $titleInput.on("input", function () { return onSearch(movies); });
+        $genreInput.on("input", function () { return onSearch(movies); });
+        $castInput.on("input", function () { return onSearch(movies); });
         fillUi(movies);
     });
 };

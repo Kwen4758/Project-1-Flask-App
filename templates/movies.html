@@ -8,7 +8,6 @@
       <option value="year_d" label="Sort by Year 1990-2018">
       <option value="year_a" label="Sort by Year 2018-1990">
     </select>
-    <button class="search-button" id="searchButton">Perform Search</button>
   </div>
   <table class="table table-bordered">
     <thead>
@@ -21,9 +20,9 @@
         <th scope="col" style="width: 15%">
           Year
           <br>
-          <input type="number" min="1900" max="2018" step="1" value="1900" id="yearMinInput" class="search-input" onchange="(validity.valid)||(value='1900');"/>
+          <input type="number" min="1900" max="2018" step="1" value="1900" id="yearMinInput" class="search-input"/>
           -
-          <input type="number" min="1900" max="2018" step="1" value="2018" id="yearMaxInput" class="search-input" onchange="(validity.valid)||(value='2018');"/>
+          <input type="number" min="1900" max="2018" step="1" value="2018" id="yearMaxInput" class="search-input"/>
         </th>
         <th scope="col" style="width: 45%">
           Cast

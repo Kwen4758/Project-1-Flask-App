@@ -53,6 +53,11 @@ const getUniqueActors = (movies: Movie[]): Actor[] => {
   return finalActors;
 };
 
+const yearChangeChecker = ($inputElement: JQuery<HTMLElement>) => {
+  if (+$inputElement.val() < 1900) $inputElement.val(1900);
+  if (+$inputElement.val() > 2018) $inputElement.val(2018);
+};
+
 const homePageHandler = () => {
   const $displayArea = $("#moviesInfo");
   const getMovieGenres = (movies: Movie[]) => {
@@ -83,10 +88,10 @@ const actorsPageHandler = () => {
   const $nameInput = $("#nameInput");
   const $genreInput = $("#genreInput");
   const $movieInput = $("#movieInput");
-  const $searchButton = $("#searchButton");
   const timeouts: NodeJS.Timeout[] = [];
   const fillUi = (actors: Actor[]) => {
     timeouts.forEach((timeout) => clearTimeout(timeout));
+    timeouts.length = 0;
     $actorsTable.empty();
     actors.forEach(({ name, movies, genres }) => {
       timeouts.push(
@@ -133,7 +138,9 @@ const actorsPageHandler = () => {
   };
   getDataThen((movies) => {
     const uniqueActors = getUniqueActors(movies);
-    $searchButton.on("click", () => onSearch(uniqueActors));
+    $nameInput.on("input", () => onSearch(uniqueActors));
+    $genreInput.on("input", () => onSearch(uniqueActors));
+    $movieInput.on("input", () => onSearch(uniqueActors));
     fillUi(uniqueActors);
   });
 };
@@ -146,7 +153,6 @@ const moviesPageHandler = () => {
   const $castInput = $("#castInput");
   const $genreInput = $("#genreInput");
   const $sortSelect = $("#sortInput");
-  const $searchButton = $("#searchButton");
   const timeouts: NodeJS.Timeout[] = [];
   const sortMovies = (rawMovies: Movie[], sortType: string) => {
     const sortedMovies = [...rawMovies];
@@ -163,6 +169,7 @@ const moviesPageHandler = () => {
   };
   const fillUi = (movies: Movie[]) => {
     timeouts.forEach((timeout) => clearTimeout(timeout));
+    timeouts.length = 0;
     $movieTable.empty();
     const sortedMovies = sortMovies(movies, $sortSelect.val() as string);
     sortedMovies.forEach(({ title, year, cast, genres }) => {
@@ -173,11 +180,11 @@ const moviesPageHandler = () => {
             .map((actor) => `<a href="${ORIGIN}/actor/${actor}">${actor}</a>`);
           $movieTable.append(
             `<tr>
-            <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
-            <td>${year}</td>
-            <td>${castLinks.join(", ")}</td>
-            <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
-          </tr>`
+              <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
+              <td>${year}</td>
+              <td>${castLinks.join(", ")}</td>
+              <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
+            </tr>`
           );
         }, 0)
       );
@@ -211,8 +218,17 @@ const moviesPageHandler = () => {
     fillUi(resolvedMovies);
   };
   getDataThen((movies) => {
-    $searchButton.on("click", () => onSearch(movies));
+    const yearHandler = () => {
+      yearChangeChecker($yearMaxInput);
+      yearChangeChecker($yearMinInput);
+      onSearch(movies);
+    };
     $sortSelect.on("change", () => onSearch(movies));
+    $yearMinInput.on("change", () => yearHandler());
+    $yearMaxInput.on("change", () => yearHandler());
+    $titleInput.on("input", () => onSearch(movies));
+    $genreInput.on("input", () => onSearch(movies));
+    $castInput.on("input", () => onSearch(movies));
     fillUi(movies);
   });
 };
