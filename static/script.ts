@@ -23,6 +23,12 @@ const getDataThen = (onSuccess: (movies: Movie[]) => void) => {
   });
 };
 
+const decode = (encoded: string) => {
+  return new DOMParser()
+    .parseFromString(decodeURIComponent(encoded), "text/html")
+    .querySelector("html").textContent;
+};
+
 const getUniqueActors = (movies: Movie[]): Actor[] => {
   const partialActors: { [name: string]: { name: string; movies: Movie[] } } =
     {};
@@ -99,11 +105,16 @@ const actorsPageHandler = () => {
           const movieLinks = movies
             .sort((a, b) => a.title.localeCompare(b.title))
             .map(
-              ({ title }) => `<a href="${ORIGIN}/movie/${encodeURIComponent(title)}">${title}</a>`
+              ({ title }) =>
+                `<a href="${ORIGIN}/movie/${encodeURIComponent(
+                  title
+                )}">${title}</a>`
             );
           $actorsTable.append(
             `<tr>
-              <td><a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a></td>
+              <td><a href="${ORIGIN}/actor/${encodeURIComponent(
+              name
+            )}">${name}</a></td>
               <td>${movieLinks.join(", ")}</td>
               <td>${genres.join(", ")}</td>
             </tr>`
@@ -177,10 +188,17 @@ const moviesPageHandler = () => {
         setTimeout(() => {
           const castLinks = cast
             .sort((a, b) => a.localeCompare(b))
-            .map((name) => `<a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a>`);
+            .map(
+              (name) =>
+                `<a href="${ORIGIN}/actor/${encodeURIComponent(
+                  name
+                )}">${name}</a>`
+            );
           $movieTable.append(
             `<tr>
-              <td><a href="${ORIGIN}/movie/${encodeURIComponent(title)}">${title}</a></td>
+              <td><a href="${ORIGIN}/movie/${encodeURIComponent(
+              title
+            )}">${title}</a></td>
               <td>${year}</td>
               <td>${castLinks.join(", ")}</td>
               <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
@@ -234,7 +252,7 @@ const moviesPageHandler = () => {
 };
 
 const actorPageHandler = (actorURIComponent: string) => {
-  const actorName = decodeURIComponent(actorURIComponent);
+  const actorName = decode(actorURIComponent);
   const $movieTable = $("#moviesTableBody");
   const $actorName = $("#actorName");
   getDataThen((movies) => {
@@ -245,10 +263,15 @@ const actorPageHandler = (actorURIComponent: string) => {
     [...new Set(myMovies)].forEach(({ title, year, cast, genres }) => {
       const castLinks = cast
         .sort((a, b) => a.localeCompare(b))
-        .map((name) => `<a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a>`);
+        .map(
+          (name) =>
+            `<a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a>`
+        );
       $movieTable.append(
         `<tr>
-          <td><a href="${ORIGIN}/movie/${encodeURIComponent(title)}">${title}</a></td>
+          <td><a href="${ORIGIN}/movie/${encodeURIComponent(
+          title
+        )}">${title}</a></td>
           <td>${year}</td>
           <td>${castLinks.join(", ")}</td>
           <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
@@ -259,7 +282,7 @@ const actorPageHandler = (actorURIComponent: string) => {
 };
 
 const moviePageHandler = (movieURIComponent: string) => {
-  const movieTitle = decodeURIComponent(movieURIComponent);
+  const movieTitle = decode(movieURIComponent);
   console.log(movieTitle, movieURIComponent);
   const $genreList = $("#genreList");
   const $actorList = $("#actorList");
@@ -283,7 +306,9 @@ const moviePageHandler = (movieURIComponent: string) => {
     if (actors.length > 0) {
       actors.forEach((name) => {
         $actorList.append(
-          `<li><a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a></li>`
+          `<li><a href="${ORIGIN}/actor/${encodeURIComponent(
+            name
+          )}">${name}</a></li>`
         );
       });
     }
