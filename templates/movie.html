@@ -1,9 +1,17 @@
 {% extends "base.html" %} {% block content %}
 <div class="container">
   <div class="text-center">
-    <h1>{{title}}</h1>
+    <h1 id="movieTitle"></h1>
+    <h4 id="movieYear"></h4>
   </div>
-  <ul id="movieInfo"></ul>
+  <div>
+    <h2>Cast:</h2>
+    <ul id="actorList"></ul>
+  </div>
+  <div>
+    <h2>Genres:</h2>
+    <ul id="genreList"></ul>
+  </div>
 </div>
 {% endblock %}
 

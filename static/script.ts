@@ -99,11 +99,11 @@ const actorsPageHandler = () => {
           const movieLinks = movies
             .sort((a, b) => a.title.localeCompare(b.title))
             .map(
-              ({ title }) => `<a href="${ORIGIN}/movie/${title}">${title}</a>`
+              ({ title }) => `<a href="${ORIGIN}/movie/${encodeURIComponent(title)}">${title}</a>`
             );
           $actorsTable.append(
             `<tr>
-              <td><a href="${ORIGIN}/actor/${name}">${name}</a></td>
+              <td><a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a></td>
               <td>${movieLinks.join(", ")}</td>
               <td>${genres.join(", ")}</td>
             </tr>`
@@ -177,10 +177,10 @@ const moviesPageHandler = () => {
         setTimeout(() => {
           const castLinks = cast
             .sort((a, b) => a.localeCompare(b))
-            .map((actor) => `<a href="${ORIGIN}/actor/${actor}">${actor}</a>`);
+            .map((name) => `<a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a>`);
           $movieTable.append(
             `<tr>
-              <td><a href="${ORIGIN}/movie/${title}">${title}</a></td>
+              <td><a href="${ORIGIN}/movie/${encodeURIComponent(title)}">${title}</a></td>
               <td>${year}</td>
               <td>${castLinks.join(", ")}</td>
               <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
@@ -233,38 +233,57 @@ const moviesPageHandler = () => {
   });
 };
 
-const actorPageHandler = (actor: string) => {
-  const $displayArea = $("#actorInfo");
+const actorPageHandler = (actorURIComponent: string) => {
+  const actorName = decodeURIComponent(actorURIComponent);
+  const $movieTable = $("#moviesTableBody");
+  const $actorName = $("#actorName");
   getDataThen((movies) => {
-    const myMovies = movies.filter((movie) => movie.cast.includes(actor));
-    [...new Set(myMovies)].forEach(({ title }) => {
-      $displayArea.append(
-        `<li><a href="${ORIGIN}/movie/${title}">${title}</a></li>`
+    $actorName.html(actorName);
+    const myMovies = movies
+      .filter((movie) => movie.cast.includes(actorName))
+      .sort((a, b) => a.year - b.year);
+    [...new Set(myMovies)].forEach(({ title, year, cast, genres }) => {
+      const castLinks = cast
+        .sort((a, b) => a.localeCompare(b))
+        .map((name) => `<a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a>`);
+      $movieTable.append(
+        `<tr>
+          <td><a href="${ORIGIN}/movie/${encodeURIComponent(title)}">${title}</a></td>
+          <td>${year}</td>
+          <td>${castLinks.join(", ")}</td>
+          <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
+        </tr>`
       );
     });
   });
 };
 
-const moviePageHandler = (movieTitle: string) => {
-  const $displayArea = $("#movieInfo");
+const moviePageHandler = (movieURIComponent: string) => {
+  const movieTitle = decodeURIComponent(movieURIComponent);
+  console.log(movieTitle, movieURIComponent);
+  const $genreList = $("#genreList");
+  const $actorList = $("#actorList");
+  const $movieTitle = $("#movieTitle");
+  const $movieYear = $("#movieYear");
   getDataThen((movies) => {
-    const movie = movies.find((movie) => movie.title === movieTitle);
-    const actors = [...new Set(movie.cast)].sort((a, b) => a.localeCompare(b));
-    const genres = [...new Set(movie.genres)].sort((a, b) =>
-      a.localeCompare(b)
-    );
-    $displayArea.append(`<li>Year Released: ${movie.year}</li>`);
+    const {
+      cast,
+      genres: rawGenres,
+      year,
+    } = movies.find((movie) => movie.title === movieTitle);
+    $movieYear.html(`Released ${year}`);
+    $movieTitle.html(movieTitle);
+    const actors = [...new Set(cast)].sort((a, b) => a.localeCompare(b));
+    const genres = [...new Set(rawGenres)].sort((a, b) => a.localeCompare(b));
     if (genres.length > 0) {
-      $displayArea.append(`<li>Movie Genres:</li>`);
       genres.forEach((genre) => {
-        $displayArea.append(`<li>${genre}</li>`);
+        $genreList.append(`<li>${genre}</li>`);
       });
     }
     if (actors.length > 0) {
-      $displayArea.append(`<li>Movie Cast (${actors.length} actors):</li>`);
-      actors.forEach((actor) => {
-        $displayArea.append(
-          `<li><a href="${ORIGIN}/actor/${actor}">${actor}</a></li>`
+      actors.forEach((name) => {
+        $actorList.append(
+          `<li><a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a></li>`
         );
       });
     }

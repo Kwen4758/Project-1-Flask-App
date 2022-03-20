@@ -111,9 +111,9 @@ var actorsPageHandler = function () {
                     .sort(function (a, b) { return a.title.localeCompare(b.title); })
                     .map(function (_a) {
                     var title = _a.title;
-                    return "<a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a>");
+                    return "<a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a>");
                 });
-                $actorsTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/actor/").concat(name, "\">").concat(name, "</a></td>\n              <td>").concat(movieLinks.join(", "), "</td>\n              <td>").concat(genres.join(", "), "</td>\n            </tr>"));
+                $actorsTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a></td>\n              <td>").concat(movieLinks.join(", "), "</td>\n              <td>").concat(genres.join(", "), "</td>\n            </tr>"));
             }, 0));
         });
     };
@@ -176,8 +176,8 @@ var moviesPageHandler = function () {
             timeouts.push(setTimeout(function () {
                 var castLinks = cast
                     .sort(function (a, b) { return a.localeCompare(b); })
-                    .map(function (actor) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a>"); });
-                $movieTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></td>\n              <td>").concat(year, "</td>\n              <td>").concat(castLinks.join(", "), "</td>\n              <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n            </tr>"));
+                    .map(function (name) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a>"); });
+                $movieTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a></td>\n              <td>").concat(year, "</td>\n              <td>").concat(castLinks.join(", "), "</td>\n              <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n            </tr>"));
             }, 0));
         });
     };
@@ -216,35 +216,45 @@ var moviesPageHandler = function () {
         fillUi(movies);
     });
 };
-var actorPageHandler = function (actor) {
-    var $displayArea = $("#actorInfo");
+var actorPageHandler = function (actorURIComponent) {
+    var actorName = decodeURIComponent(actorURIComponent);
+    var $movieTable = $("#moviesTableBody");
+    var $actorName = $("#actorName");
     getDataThen(function (movies) {
-        var myMovies = movies.filter(function (movie) { return movie.cast.includes(actor); });
+        $actorName.html(actorName);
+        var myMovies = movies
+            .filter(function (movie) { return movie.cast.includes(actorName); })
+            .sort(function (a, b) { return a.year - b.year; });
         __spreadArray([], __read(new Set(myMovies)), false).forEach(function (_a) {
-            var title = _a.title;
-            $displayArea.append("<li><a href=\"".concat(ORIGIN, "/movie/").concat(title, "\">").concat(title, "</a></li>"));
+            var title = _a.title, year = _a.year, cast = _a.cast, genres = _a.genres;
+            var castLinks = cast
+                .sort(function (a, b) { return a.localeCompare(b); })
+                .map(function (name) { return "<a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a>"); });
+            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(castLinks.join(", "), "</td>\n          <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n        </tr>"));
         });
     });
 };
-var moviePageHandler = function (movieTitle) {
-    var $displayArea = $("#movieInfo");
+var moviePageHandler = function (movieURIComponent) {
+    var movieTitle = decodeURIComponent(movieURIComponent);
+    console.log(movieTitle, movieURIComponent);
+    var $genreList = $("#genreList");
+    var $actorList = $("#actorList");
+    var $movieTitle = $("#movieTitle");
+    var $movieYear = $("#movieYear");
     getDataThen(function (movies) {
-        var movie = movies.find(function (movie) { return movie.title === movieTitle; });
-        var actors = __spreadArray([], __read(new Set(movie.cast)), false).sort(function (a, b) { return a.localeCompare(b); });
-        var genres = __spreadArray([], __read(new Set(movie.genres)), false).sort(function (a, b) {
-            return a.localeCompare(b);
-        });
-        $displayArea.append("<li>Year Released: ".concat(movie.year, "</li>"));
+        var _a = movies.find(function (movie) { return movie.title === movieTitle; }), cast = _a.cast, rawGenres = _a.genres, year = _a.year;
+        $movieYear.html("Released ".concat(year));
+        $movieTitle.html(movieTitle);
+        var actors = __spreadArray([], __read(new Set(cast)), false).sort(function (a, b) { return a.localeCompare(b); });
+        var genres = __spreadArray([], __read(new Set(rawGenres)), false).sort(function (a, b) { return a.localeCompare(b); });
         if (genres.length > 0) {
-            $displayArea.append("<li>Movie Genres:</li>");
             genres.forEach(function (genre) {
-                $displayArea.append("<li>".concat(genre, "</li>"));
+                $genreList.append("<li>".concat(genre, "</li>"));
             });
         }
         if (actors.length > 0) {
-            $displayArea.append("<li>Movie Cast (".concat(actors.length, " actors):</li>"));
-            actors.forEach(function (actor) {
-                $displayArea.append("<li><a href=\"".concat(ORIGIN, "/actor/").concat(actor, "\">").concat(actor, "</a></li>"));
+            actors.forEach(function (name) {
+                $actorList.append("<li><a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a></li>"));
             });
         }
     });

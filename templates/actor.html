@@ -1,9 +1,28 @@
 {% extends "base.html" %} {% block content %}
 <div class="container">
   <div class="text-center">
-    <h1>{{name}}</h1>
+    <h1 id="actorName"></h1>
   </div>
-  <ul id="actorInfo"></ul>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col" style="width: 25%">
+          Title
+        </th>
+        <th scope="col" style="width: 15%">
+          Year
+        </th>
+        <th scope="col" style="width: 45%">
+          Cast
+        </th>
+        <th scope="col" style="width: 15%">
+          Genres
+        </th>
+      </tr>
+    </thead>
+    <tbody id="moviesTableBody">
+    </tbody>
+  </table>
 </div>
 {% endblock %}
 
