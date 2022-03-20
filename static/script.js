@@ -73,7 +73,10 @@ var yearChangeChecker = function ($inputElement) {
         $inputElement.val(2018);
 };
 var homePageHandler = function () {
-    var $displayArea = $("#moviesInfo");
+    var $genreList = $("#genreList");
+    var $movieCount = $("#movieCount");
+    var $actorCount = $("#actorCount");
+    var $genreCount = $("#genreCount");
     var getMovieGenres = function (movies) {
         var allGenres = {};
         movies.forEach(function (movie) {
@@ -88,14 +91,14 @@ var homePageHandler = function () {
         return allGenres;
     };
     getDataThen(function (movies) {
-        var genres = getMovieGenres(movies);
+        var genreCounts = Object.entries(getMovieGenres(movies)).sort(function (a, b) { return b[1] - a[1]; });
         var actors = getUniqueActors(movies);
-        $displayArea.append("<li>Number of Actors: ".concat(actors.length, "</li>"));
-        $displayArea.append("<li>Number of Movies: ".concat(movies.length, "</li>"));
-        $displayArea.append("<li>Number of Movies in Each Genre:</li>");
-        Object.entries(genres).forEach(function (_a) {
+        $movieCount.html("".concat(movies.length, " Movies"));
+        $actorCount.html("".concat(actors.length, " Actors"));
+        $genreCount.html("".concat(genreCounts.length, " Genres:"));
+        genreCounts.forEach(function (_a) {
             var _b = __read(_a, 2), genre = _b[0], count = _b[1];
-            $displayArea.append("<li>Number of ".concat(genre, " Movies: ").concat(count, "</li>"));
+            $genreList.append("<li>".concat(genre, " Movies: ").concat(count, "</li>"));
         });
     });
 };
@@ -115,8 +118,8 @@ var actorsPageHandler = function () {
                 var movieLinks = movies
                     .sort(function (a, b) { return a.title.localeCompare(b.title); })
                     .map(function (_a) {
-                    var title = _a.title;
-                    return "<a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a>");
+                    var title = _a.title, year = _a.year;
+                    return "<a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent("".concat(title, "@").concat(year)), "\">").concat(title, "</a>");
                 });
                 $actorsTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a></td>\n              <td>").concat(movieLinks.join(", "), "</td>\n              <td>").concat(genres.join(", "), "</td>\n            </tr>"));
             }, 0));
@@ -183,7 +186,7 @@ var moviesPageHandler = function () {
                     .map(function (name) {
                     return "<a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a>");
                 });
-                $movieTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a></td>\n              <td>").concat(year, "</td>\n              <td>").concat(castLinks.join(", "), "</td>\n              <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n            </tr>"));
+                $movieTable.append("<tr>\n              <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent("".concat(title, "@").concat(year)), "\">").concat(title, "</a></td>\n              <td>").concat(year, "</td>\n              <td>").concat(castLinks.join(", "), "</td>\n              <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n            </tr>"));
             }, 0));
         });
     };
@@ -237,21 +240,23 @@ var actorPageHandler = function (actorURIComponent) {
                 .map(function (name) {
                 return "<a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a>");
             });
-            $movieTable.append("<tr>\n            <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a></td>\n            <td>").concat(year, "</td>\n            <td>").concat(castLinks.join(", "), "</td>\n            <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n          </tr>"));
+            $movieTable.append("<tr>\n            <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent("".concat(title, "@").concat(year)), "\">").concat(title, "</a></td>\n            <td>").concat(year, "</td>\n            <td>").concat(castLinks.join(", "), "</td>\n            <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n          </tr>"));
         });
     });
 };
 var moviePageHandler = function (movieURIComponent) {
-    var movieTitle = decode(movieURIComponent);
-    console.log(movieTitle, movieURIComponent);
+    var _a = __read(decode(movieURIComponent).split("@"), 2), movieTitle = _a[0], movieYear = _a[1];
     var $genreList = $("#genreList");
     var $actorList = $("#actorList");
     var $movieTitle = $("#movieTitle");
     var $movieYear = $("#movieYear");
     getDataThen(function (movies) {
-        var _a = movies.find(function (movie) { return movie.title === movieTitle; }), cast = _a.cast, rawGenres = _a.genres, year = _a.year;
-        $movieYear.html("Released ".concat(year));
+        var _a = movies.find(function (_a) {
+            var title = _a.title, year = _a.year;
+            return title === movieTitle && year === +movieYear;
+        }), cast = _a.cast, rawGenres = _a.genres, year = _a.year;
         $movieTitle.html(movieTitle);
+        $movieYear.html("Released ".concat(movieYear));
         var actors = __spreadArray([], __read(new Set(cast)), false).sort(function (a, b) { return a.localeCompare(b); });
         var genres = __spreadArray([], __read(new Set(rawGenres)), false).sort(function (a, b) { return a.localeCompare(b); });
         if (genres.length > 0) {

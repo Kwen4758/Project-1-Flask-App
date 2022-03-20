@@ -65,7 +65,10 @@ const yearChangeChecker = ($inputElement: JQuery<HTMLElement>) => {
 };
 
 const homePageHandler = () => {
-  const $displayArea = $("#moviesInfo");
+  const $genreList = $("#genreList");
+  const $movieCount = $("#movieCount");
+  const $actorCount = $("#actorCount");
+  const $genreCount = $("#genreCount");
   const getMovieGenres = (movies: Movie[]) => {
     const allGenres: { [title: string]: number } = {};
     movies.forEach((movie) => {
@@ -78,13 +81,15 @@ const homePageHandler = () => {
     return allGenres;
   };
   getDataThen((movies) => {
-    const genres = getMovieGenres(movies);
+    const genreCounts = Object.entries(getMovieGenres(movies)).sort(
+      (a, b) => b[1] - a[1]
+    );
     const actors = getUniqueActors(movies);
-    $displayArea.append(`<li>Number of Actors: ${actors.length}</li>`);
-    $displayArea.append(`<li>Number of Movies: ${movies.length}</li>`);
-    $displayArea.append(`<li>Number of Movies in Each Genre:</li>`);
-    Object.entries(genres).forEach(([genre, count]) => {
-      $displayArea.append(`<li>Number of ${genre} Movies: ${count}</li>`);
+    $movieCount.html(`${movies.length} Movies`);
+    $actorCount.html(`${actors.length} Actors`);
+    $genreCount.html(`${genreCounts.length} Genres:`);
+    genreCounts.forEach(([genre, count]) => {
+      $genreList.append(`<li>${genre} Movies: ${count}</li>`);
     });
   });
 };
@@ -105,9 +110,9 @@ const actorsPageHandler = () => {
           const movieLinks = movies
             .sort((a, b) => a.title.localeCompare(b.title))
             .map(
-              ({ title }) =>
+              ({ title, year }) =>
                 `<a href="${ORIGIN}/movie/${encodeURIComponent(
-                  title
+                  `${title}@${year}`
                 )}">${title}</a>`
             );
           $actorsTable.append(
@@ -197,7 +202,7 @@ const moviesPageHandler = () => {
           $movieTable.append(
             `<tr>
               <td><a href="${ORIGIN}/movie/${encodeURIComponent(
-              title
+              `${title}@${year}`
             )}">${title}</a></td>
               <td>${year}</td>
               <td>${castLinks.join(", ")}</td>
@@ -272,7 +277,7 @@ const actorPageHandler = (actorURIComponent: string) => {
         $movieTable.append(
           `<tr>
             <td><a href="${ORIGIN}/movie/${encodeURIComponent(
-            title
+            `${title}@${year}`
           )}">${title}</a></td>
             <td>${year}</td>
             <td>${castLinks.join(", ")}</td>
@@ -284,8 +289,7 @@ const actorPageHandler = (actorURIComponent: string) => {
 };
 
 const moviePageHandler = (movieURIComponent: string) => {
-  const movieTitle = decode(movieURIComponent);
-  console.log(movieTitle, movieURIComponent);
+  const [movieTitle, movieYear] = decode(movieURIComponent).split("@");
   const $genreList = $("#genreList");
   const $actorList = $("#actorList");
   const $movieTitle = $("#movieTitle");
@@ -295,9 +299,11 @@ const moviePageHandler = (movieURIComponent: string) => {
       cast,
       genres: rawGenres,
       year,
-    } = movies.find((movie) => movie.title === movieTitle);
-    $movieYear.html(`Released ${year}`);
+    } = movies.find(
+      ({ title, year }) => title === movieTitle && year === +movieYear
+    );
     $movieTitle.html(movieTitle);
+    $movieYear.html(`Released ${movieYear}`);
     const actors = [...new Set(cast)].sort((a, b) => a.localeCompare(b));
     const genres = [...new Set(rawGenres)].sort((a, b) => a.localeCompare(b));
     if (genres.length > 0) {
