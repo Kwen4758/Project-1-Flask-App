@@ -33,7 +33,7 @@ const getUniqueActors = (movies: Movie[]): Actor[] => {
   const partialActors: { [name: string]: { name: string; movies: Movie[] } } =
     {};
   movies.forEach((movie) => {
-    movie.cast.forEach((name) => {
+    [...new Set(movie.cast)].forEach((name) => {
       if (!partialActors[name]) partialActors[name] = { name, movies: [movie] };
       else partialActors[name].movies.push(movie);
     });
@@ -186,7 +186,7 @@ const moviesPageHandler = () => {
     sortedMovies.forEach(({ title, year, cast, genres }) => {
       timeouts.push(
         setTimeout(() => {
-          const castLinks = cast
+          const castLinks = [...new Set(cast)]
             .sort((a, b) => a.localeCompare(b))
             .map(
               (name) =>
@@ -257,27 +257,29 @@ const actorPageHandler = (actorURIComponent: string) => {
   const $actorName = $("#actorName");
   getDataThen((movies) => {
     $actorName.html(actorName);
-    const myMovies = movies
+    movies
       .filter((movie) => movie.cast.includes(actorName))
-      .sort((a, b) => a.year - b.year);
-    [...new Set(myMovies)].forEach(({ title, year, cast, genres }) => {
-      const castLinks = cast
-        .sort((a, b) => a.localeCompare(b))
-        .map(
-          (name) =>
-            `<a href="${ORIGIN}/actor/${encodeURIComponent(name)}">${name}</a>`
+      .sort((a, b) => a.year - b.year)
+      .forEach(({ title, year, cast, genres }) => {
+        const castLinks = [...new Set(cast)]
+          .sort((a, b) => a.localeCompare(b))
+          .map(
+            (name) =>
+              `<a href="${ORIGIN}/actor/${encodeURIComponent(
+                name
+              )}">${name}</a>`
+          );
+        $movieTable.append(
+          `<tr>
+            <td><a href="${ORIGIN}/movie/${encodeURIComponent(
+            title
+          )}">${title}</a></td>
+            <td>${year}</td>
+            <td>${castLinks.join(", ")}</td>
+            <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
+          </tr>`
         );
-      $movieTable.append(
-        `<tr>
-          <td><a href="${ORIGIN}/movie/${encodeURIComponent(
-          title
-        )}">${title}</a></td>
-          <td>${year}</td>
-          <td>${castLinks.join(", ")}</td>
-          <td>${genres.sort((a, b) => a.localeCompare(b)).join(", ")}</td>
-        </tr>`
-      );
-    });
+      });
   });
 };
 

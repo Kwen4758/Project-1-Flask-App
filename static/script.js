@@ -40,7 +40,7 @@ var decode = function (encoded) {
 var getUniqueActors = function (movies) {
     var partialActors = {};
     movies.forEach(function (movie) {
-        movie.cast.forEach(function (name) {
+        __spreadArray([], __read(new Set(movie.cast)), false).forEach(function (name) {
             if (!partialActors[name])
                 partialActors[name] = { name: name, movies: [movie] };
             else
@@ -179,8 +179,7 @@ var moviesPageHandler = function () {
         sortedMovies.forEach(function (_a) {
             var title = _a.title, year = _a.year, cast = _a.cast, genres = _a.genres;
             timeouts.push(setTimeout(function () {
-                var castLinks = cast
-                    .sort(function (a, b) { return a.localeCompare(b); })
+                var castLinks = __spreadArray([], __read(new Set(cast)), false).sort(function (a, b) { return a.localeCompare(b); })
                     .map(function (name) {
                     return "<a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a>");
                 });
@@ -229,17 +228,16 @@ var actorPageHandler = function (actorURIComponent) {
     var $actorName = $("#actorName");
     getDataThen(function (movies) {
         $actorName.html(actorName);
-        var myMovies = movies
+        movies
             .filter(function (movie) { return movie.cast.includes(actorName); })
-            .sort(function (a, b) { return a.year - b.year; });
-        __spreadArray([], __read(new Set(myMovies)), false).forEach(function (_a) {
+            .sort(function (a, b) { return a.year - b.year; })
+            .forEach(function (_a) {
             var title = _a.title, year = _a.year, cast = _a.cast, genres = _a.genres;
-            var castLinks = cast
-                .sort(function (a, b) { return a.localeCompare(b); })
+            var castLinks = __spreadArray([], __read(new Set(cast)), false).sort(function (a, b) { return a.localeCompare(b); })
                 .map(function (name) {
                 return "<a href=\"".concat(ORIGIN, "/actor/").concat(encodeURIComponent(name), "\">").concat(name, "</a>");
             });
-            $movieTable.append("<tr>\n          <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a></td>\n          <td>").concat(year, "</td>\n          <td>").concat(castLinks.join(", "), "</td>\n          <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n        </tr>"));
+            $movieTable.append("<tr>\n            <td><a href=\"".concat(ORIGIN, "/movie/").concat(encodeURIComponent(title), "\">").concat(title, "</a></td>\n            <td>").concat(year, "</td>\n            <td>").concat(castLinks.join(", "), "</td>\n            <td>").concat(genres.sort(function (a, b) { return a.localeCompare(b); }).join(", "), "</td>\n          </tr>"));
         });
     });
 };
